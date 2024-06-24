@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,13 +35,22 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody UserLoginDto userLoginDto){
+
+        User newUser = userRepository.findByUsername(userLoginDto.getUsername());
+        System.out.println(userLoginDto.getUsername() + " " + userLoginDto.getPassword());
+        if(newUser == null || !passwordEncoder.matches(userLoginDto.getPassword(), newUser.getPassword())){
+            return new ResponseEntity<>("An error occurred while trying to log in : username or password is wrong.", HttpStatus.BAD_REQUEST);
+        }
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDto.getUsername(), userLoginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return new ResponseEntity<>(authentication.getDetails(), HttpStatus.OK);
+        return new ResponseEntity<>("User is now authenticated " + SecurityContextHolder.getContext().getAuthentication(), HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -59,8 +69,8 @@ public class AuthController {
         return new ResponseEntity<>("User "+ newUser.username + " successfully created - ", HttpStatus.OK);
     }
 
-    // @PostMapping("/test")
-    // public List<User> test(){
-    //     return userRepository.findAll();
-    // }
+    @PostMapping("/test")
+    public List<User> test(){
+        return userRepository.findAll();
+    }
 }
