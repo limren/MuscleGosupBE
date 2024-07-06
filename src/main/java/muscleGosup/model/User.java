@@ -1,14 +1,19 @@
 package muscleGosup.model;
 
+
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
     @Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"id"}),
         @UniqueConstraint(columnNames = {"username"}),
         @UniqueConstraint(columnNames = {"email"})
     })
@@ -19,6 +24,9 @@ public class User {
     public String username;
     public String email;
     public String password;
+
+    @OneToMany
+    private List<WorkoutSession> workoutSessions;
 
     public User(){};
 
@@ -48,4 +56,10 @@ public class User {
         this.password = password;
     }
 
+    public List<WorkoutSession> getWorkoutSessions(){
+        return this.workoutSessions;
+    }
+    public void setWorkoutSessions(List<WorkoutSession> workoutSessions) {
+        this.workoutSessions = workoutSessions;
+    }
 }

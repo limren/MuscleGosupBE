@@ -42,7 +42,6 @@ public class AuthController {
     public ResponseEntity<Object> login(@RequestBody UserLoginDto userLoginDto){
 
         User newUser = userRepository.findByUsername(userLoginDto.getUsername());
-        System.out.println(userLoginDto.getUsername() + " " + userLoginDto.getPassword());
         if(newUser == null || !passwordEncoder.matches(userLoginDto.getPassword(), newUser.getPassword())){
             return new ResponseEntity<>("An error occurred while trying to log in : username or password is wrong.", HttpStatus.BAD_REQUEST);
         }
