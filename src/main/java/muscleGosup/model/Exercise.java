@@ -1,5 +1,6 @@
 package muscleGosup.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -15,7 +16,7 @@ public class Exercise {
     private Long id;
 
     private String name;
-    private List<Integer> sets;
+    private List<Integer> sets = new ArrayList<>();
 
     @ManyToOne
     private WorkoutSession workoutSession;
@@ -33,5 +34,13 @@ public class Exercise {
 
     public void setSets(List<Integer> sets){
         this.sets = sets;
+    }
+
+    public WorkoutSession getWorkoutSession(){
+        return this.workoutSession;
+    }
+    
+    public void setWorkoutSession(WorkoutSession workoutSession){
+        this.workoutSession = workoutSession;
     }
 }

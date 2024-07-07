@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -29,8 +30,7 @@ public class WorkoutSession {
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    // One workout session have many exercises
-    @OneToMany
+    @OneToMany(mappedBy = "workoutSession", cascade = CascadeType.ALL)
     private List<Exercise> exercises = new ArrayList<>();
 
     public Long getId() {
