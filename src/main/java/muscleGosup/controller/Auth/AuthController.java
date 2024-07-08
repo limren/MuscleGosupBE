@@ -8,13 +8,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import muscleGosup.dto.Auth.UserLoginDto;
 import muscleGosup.dto.Auth.UserRegisterDto;
 import muscleGosup.model.User;
@@ -39,17 +44,20 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody UserLoginDto userLoginDto){
-
+    public ResponseEntity<Object> login(@RequestBody UserLoginDto userLoginDto,
+    HttpServletRequest request,
+    HttpServletResponse response){
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
         User newUser = userRepository.findByUsername(userLoginDto.getUsername());
         if(newUser == null || !passwordEncoder.matches(userLoginDto.getPassword(), newUser.getPassword())){
             return new ResponseEntity<>("An error occurred while trying to log in : username or password is wrong.", HttpStatus.BAD_REQUEST);
         }
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDto.getUsername(), userLoginDto.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return new ResponseEntity<>("User is now authenticated " + SecurityContextHolder.getContext().getAuthentication(), HttpStatus.OK);
+        context.setAuthentication(authentication);
+        SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+        securityContextRepository.saveContext(context, request, response);
+        return new ResponseEntity<>("User is now authenticated " + context.getAuthentication(), HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -65,7 +73,7 @@ public class AuthController {
 
         User newUser = userService.createUser(userRegisterDto.getUsername(), userRegisterDto.getEmail(), userRegisterDto.getPassword());
 
-        return new ResponseEntity<>("User "+ newUser.username + " successfully created - ", HttpStatus.OK);
+        return new ResponseEntity<>("User "+ newUser.username + " successfully created", HttpStatus.OK);
     }
 
     @PostMapping("/test")

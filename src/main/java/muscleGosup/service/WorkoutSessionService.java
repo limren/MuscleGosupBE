@@ -1,12 +1,14 @@
 package muscleGosup.service;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import muscleGosup.controller.UserController;
 import muscleGosup.exception.ElementNotFoundException;
+import muscleGosup.model.CustomUserDetails;
 import muscleGosup.model.Exercise;
 import muscleGosup.model.User;
 import muscleGosup.model.WorkoutSession;
@@ -15,23 +17,31 @@ import muscleGosup.repository.WorkoutSessionRepository;
 @Service
 public class WorkoutSessionService {
     private final WorkoutSessionRepository workoutSessionRepository;
-    private final UserController userController;
+    private final CommonService commonService;
     private final ExerciseService exerciseService;
-    public WorkoutSessionService(WorkoutSessionRepository workoutSessionRepository, UserController userController, ExerciseService exerciseService){
+    public WorkoutSessionService(WorkoutSessionRepository workoutSessionRepository, CommonService commonService, ExerciseService exerciseService){
         this.workoutSessionRepository = workoutSessionRepository;
-        this.userController = userController;
+        this.commonService = commonService;
         this.exerciseService = exerciseService;
     }
 
 
-    public WorkoutSession createWorkoutSession(String title, Long userId, Date duration, Date date){
-        User user = userController.getUserById(userId);        
-        WorkoutSession workoutSession = new WorkoutSession();
-        workoutSession.setTitle(title);
-        workoutSession.setUser(user);
-        workoutSession.setDate(date);
-        workoutSessionRepository.save(workoutSession);
-        return workoutSession;
+    public WorkoutSession createWorkoutSession(String title, Long duration, Date date){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+        System.out.println(principal.getClass());
+        if(principal instanceof CustomUserDetails){
+            Long userId = ((CustomUserDetails)principal).getId();
+            User user = commonService.getUserById(userId);        
+            WorkoutSession workoutSession = new WorkoutSession();
+            workoutSession.setTitle(title);
+            workoutSession.setUser(user);
+            workoutSession.setDate(date);
+            workoutSessionRepository.save(workoutSession);
+            return workoutSession;
+        } else {
+            throw new IllegalStateException("Principal is not an instance of CustomUserDetails");
+        }
     }
 
     public WorkoutSession addExerciseWorkoutSession(Long workoutSessionId, Long userId, String name){

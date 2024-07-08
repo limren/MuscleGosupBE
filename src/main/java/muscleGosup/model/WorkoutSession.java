@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,10 +24,12 @@ public class WorkoutSession {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private String title;
+
+    @JsonIgnore
     @ManyToOne
     private User user;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date duration;
+    // Store in seconds 
+    private Long duration;
 
     @Temporal(TemporalType.DATE)
     private Date date;
@@ -49,11 +53,11 @@ public class WorkoutSession {
         this.title = title;
     }
 
-    public Date getDuration() {
+    public Long getDuration() {
         return duration;
     }
 
-    public void setDuration(Date duration) {
+    public void setDuration(Long duration) {
         this.duration = duration;
     }
 

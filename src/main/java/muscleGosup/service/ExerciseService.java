@@ -12,14 +12,14 @@ import muscleGosup.repository.ExerciseRepository;
 @Service
 public class ExerciseService {
     private final ExerciseRepository exerciseRepository;
-    private final WorkoutSessionService workoutSessionService;
-    public ExerciseService(ExerciseRepository exerciseRepository, WorkoutSessionService workoutSessionService){
+    private final CommonService commonService;
+    public ExerciseService(ExerciseRepository exerciseRepository, CommonService commonService){
         this.exerciseRepository = exerciseRepository;
-        this.workoutSessionService = workoutSessionService;
+        this.commonService = commonService;
     }
 
     public Exercise createExercise(Long workoutSessionId, String name){
-        WorkoutSession workoutSession = workoutSessionService.getWorkoutSessionById(workoutSessionId);
+        WorkoutSession workoutSession = commonService.getWorkoutSessionById(workoutSessionId);
         Exercise exercise = new Exercise();
         exercise.setName(name);
         exercise.setWorkoutSession(workoutSession);
@@ -28,7 +28,7 @@ public class ExerciseService {
     }
 
     public Exercise createExercise(Long workoutSessionId, String name,  List<Integer> sets){
-        WorkoutSession workoutSession = workoutSessionService.getWorkoutSessionById(workoutSessionId);
+        WorkoutSession workoutSession = commonService.getWorkoutSessionById(workoutSessionId);
         Exercise exercise = new Exercise();
         exercise.setName(name);
         exercise.setSets(sets);

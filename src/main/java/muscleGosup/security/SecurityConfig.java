@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import muscleGosup.service.CustomUserDetailsService;
 
@@ -23,7 +24,7 @@ import muscleGosup.service.CustomUserDetailsService;
 public class SecurityConfig {
     
     @Autowired
-    private CustomUserDetailsService myCustomUserDetailsService;
+    private CustomUserDetailsService customUserDetailsService;
 
 
     @Bean
@@ -39,25 +40,28 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return new ProviderManager(Collections.singletonList(daoAuthenticationProvider()));
     }
-    
+
+    @Bean
+    public HttpSessionSecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
+
     public AuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(myCustomUserDetailsService);
+        provider.setUserDetailsService(customUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
 
 
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+        return http
         .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests((authorize) -> authorize
+            .authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
-            );
-
-        return http.build();
+            ).build();
     }
-
 }
