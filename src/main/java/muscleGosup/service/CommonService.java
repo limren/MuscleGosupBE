@@ -4,9 +4,11 @@ import org.springframework.stereotype.Service;
 
 import muscleGosup.exception.ElementNotFoundException;
 import muscleGosup.model.Exercise;
+import muscleGosup.model.Set;
 import muscleGosup.model.User;
 import muscleGosup.model.WorkoutSession;
 import muscleGosup.repository.ExerciseRepository;
+import muscleGosup.repository.SetRepository;
 import muscleGosup.repository.UserRepository;
 import muscleGosup.repository.WorkoutSessionRepository;
 
@@ -19,11 +21,12 @@ public class CommonService {
     private final UserRepository userRepository;
     private final WorkoutSessionRepository workoutSessionRepository;
     private final ExerciseRepository exerciseRepository;
-
-    public CommonService(UserRepository userRepository, WorkoutSessionRepository workoutSessionRepository, ExerciseRepository exerciseRepository){
+    private final SetRepository setRepository;
+    public CommonService(UserRepository userRepository, WorkoutSessionRepository workoutSessionRepository, ExerciseRepository exerciseRepository, SetRepository setRepository){
         this.userRepository = userRepository;
         this.workoutSessionRepository = workoutSessionRepository;
         this.exerciseRepository = exerciseRepository;
+        this.setRepository = setRepository;
     }
 
     public User getUserById(Long userId){
@@ -37,5 +40,9 @@ public class CommonService {
     public Exercise getExerciseById(Long exerciseId) {
         return exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new ElementNotFoundException("Exercise with ID : " + exerciseId + " was not found."));
+    }
+    
+    public Set getSetById(Long setId){
+        return setRepository.findById(setId).orElseThrow(() -> new ElementNotFoundException("Set with ID : " + setId + "couldn't be found."));
     }
 }

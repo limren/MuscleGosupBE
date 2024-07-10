@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import muscleGosup.exception.ElementNotFoundException;
 import muscleGosup.model.Exercise;
+import muscleGosup.model.Set;
 import muscleGosup.model.WorkoutSession;
 import muscleGosup.repository.ExerciseRepository;
 
@@ -27,7 +28,7 @@ public class ExerciseService {
         return exercise;
     }
 
-    public Exercise createExercise(Long workoutSessionId, String name,  List<Integer> sets){
+    public Exercise createExercise(Long workoutSessionId, String name,  List<Set> sets){
         WorkoutSession workoutSession = commonService.getWorkoutSessionById(workoutSessionId);
         Exercise exercise = new Exercise();
         exercise.setName(name);
@@ -38,16 +39,16 @@ public class ExerciseService {
     }
 
 
-    public Exercise addSetExercise(Long exerciseId, Integer set){
+    public Exercise addSetExercise(Long exerciseId, Set set){
         Exercise exercise = this.getExerciseById(exerciseId);
-        List<Integer> sets = exercise.getSets();
+        List<Set> sets = exercise.getSets();
         sets.add(set);
         exercise.setSets(sets);
         exerciseRepository.save(exercise);
         return exercise;
     }
 
-    public Exercise updateSetsExercise(Long exerciseId, List<Integer> sets){
+    public Exercise updateSetsExercise(Long exerciseId, List<Set> sets){
         Exercise exercise = this.getExerciseById(exerciseId);
         exercise.setSets(sets);
         exerciseRepository.save(exercise);

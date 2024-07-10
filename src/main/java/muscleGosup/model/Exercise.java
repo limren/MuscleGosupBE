@@ -3,20 +3,29 @@ package muscleGosup.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
+@Table(name = "exercises", uniqueConstraints = {
+    @UniqueConstraint(columnNames = "id")
+})
 public class Exercise {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String name;
-    private List<Integer> sets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "exercise", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Set> sets = new ArrayList<>();
 
     @ManyToOne
     private WorkoutSession workoutSession;
@@ -28,11 +37,11 @@ public class Exercise {
         this.name = name;
     }
 
-    public List<Integer> getSets(){
+    public List<Set> getSets(){
         return this.sets;
     }
 
-    public void setSets(List<Integer> sets){
+    public void setSets(List<Set> sets){
         this.sets = sets;
     }
 
