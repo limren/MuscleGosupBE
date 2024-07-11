@@ -1,10 +1,13 @@
 package muscleGosup.controller;
 
+import java.util.Collections;
 import java.util.HashMap;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,4 +36,19 @@ public class WorkoutSessionController {
             return new ResponseEntity<>(runtimeException.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    // Since workout sessions are related to one User, the convention makes that it will be retrieve by the authenticated user and so
+    // related to the userId
+    @GetMapping("/get/all")
+    public ResponseEntity<Object> getWorkoutSessionsByUserId(){
+        try{
+            return ResponseEntity.ok(Collections.singletonMap("workoutSessions", workoutSessionService.getWorkoutSessionsByUserId()));
+        } catch(IllegalAccessException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        } 
+        catch(RuntimeException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        } 
+    }
+
 }

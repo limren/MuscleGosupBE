@@ -1,5 +1,7 @@
 package muscleGosup.controller.Auth;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,23 +59,27 @@ public class AuthController {
         context.setAuthentication(authentication);
         SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
         securityContextRepository.saveContext(context, request, response);
-        return new ResponseEntity<>("User is now authenticated " + context.getAuthentication(), HttpStatus.OK);
+        return ResponseEntity.ok(Collections.singletonMap("message", "User is now authenticated."));
     }
 
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody UserRegisterDto userRegisterDto)
     {
+        HashMap<String, Object> responseContent = new HashMap<>();
         if(userRepository.existsByEmail(userRegisterDto.getEmail())){
-            return new ResponseEntity<>("The email is already taken !", HttpStatus.BAD_REQUEST);
+            responseContent.put("error", "The email is already taken!");
+            return ResponseEntity.badRequest().body(responseContent);
         }
         if(userRepository.existsByUsername(userRegisterDto.getUsername()))
         {
-            return new ResponseEntity<>("The username is already used by another user !", HttpStatus.BAD_REQUEST);
+            responseContent.put("error", "The username is already used by another user!");
+            return ResponseEntity.badRequest().body(responseContent);
         }
 
         User newUser = userService.createUser(userRegisterDto.getUsername(), userRegisterDto.getEmail(), userRegisterDto.getPassword());
-
-        return new ResponseEntity<>("User "+ newUser.username + " successfully created", HttpStatus.OK);
+        responseContent.put("user", newUser);
+        responseContent.put("message", "User successfully created.");
+        return new ResponseEntity<>(responseContent, HttpStatus.OK);
     }
 
     @PostMapping("/test")

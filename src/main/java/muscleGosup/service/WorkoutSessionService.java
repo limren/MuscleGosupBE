@@ -20,10 +20,12 @@ public class WorkoutSessionService {
     private final WorkoutSessionRepository workoutSessionRepository;
     private final CommonService commonService;
     private final ExerciseService exerciseService;
-    public WorkoutSessionService(WorkoutSessionRepository workoutSessionRepository, CommonService commonService, ExerciseService exerciseService){
+    private final UserService userService;
+    public WorkoutSessionService(WorkoutSessionRepository workoutSessionRepository, CommonService commonService, ExerciseService exerciseService, UserService userService){
         this.workoutSessionRepository = workoutSessionRepository;
         this.commonService = commonService;
         this.exerciseService = exerciseService;
+        this.userService = userService;
     }
 
 
@@ -70,5 +72,10 @@ public class WorkoutSessionService {
 
     public WorkoutSession getWorkoutSessionById(Long workoutSessionId){
         return workoutSessionRepository.findById(workoutSessionId).orElseThrow(() -> new ElementNotFoundException("Workout session with ID : " + workoutSessionId + "was not found."));
+    }
+
+    public List<WorkoutSession> getWorkoutSessionsByUserId() throws IllegalAccessException {
+        User user = userService.getAuthenticatedUser();
+        return workoutSessionRepository.findByUserId(user.getId());
     }
 }
