@@ -1,5 +1,8 @@
 package muscleGosup.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +32,7 @@ public class WorkoutSessionService {
     }
 
 
-    public WorkoutSession createWorkoutSession(String title, Long duration, Date date){
+    public WorkoutSession createWorkoutSession(String title, Long duration, LocalDateTime date){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
         System.out.println(principal.getClass());
@@ -77,5 +80,16 @@ public class WorkoutSessionService {
     public List<WorkoutSession> getWorkoutSessionsByUserId() throws IllegalAccessException {
         User user = userService.getAuthenticatedUser();
         return workoutSessionRepository.findByUserId(user.getId());
+    }
+
+    public List<WorkoutSession> getThisWeekWorkoutSessions() throws IllegalAccessException {
+        User user = userService.getAuthenticatedUser();
+        LocalDateTime currentDate = LocalDateTime.now();
+        int dayOfWeek = currentDate.getDayOfWeek().getValue();
+        LocalDateTime startOfWeek = currentDate.minusDays(dayOfWeek - 1).with(LocalTime.MIN);
+        LocalDateTime endOfWeek = currentDate.plusDays(6).with(LocalTime.of(23, 59, 59));
+
+        return workoutSessionRepository.findByUserAndDateBetween(user, startOfWeek, endOfWeek);
+        
     }
 }

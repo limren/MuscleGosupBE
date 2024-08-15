@@ -2,7 +2,6 @@ package muscleGosup.controller.Auth;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,8 +82,15 @@ public class AuthController {
         return new ResponseEntity<>(responseContent, HttpStatus.OK);
     }
 
-    @PostMapping("/test")
-    public List<User> test(){
-        return userRepository.findAll();
+    // Since it passes the SecurityFilterChain, it means that the user has been truly authenticated (cookie works)
+   @GetMapping("/isLoggedIn")
+   public ResponseEntity<Object> isLoggedIn(){
+    try {
+        userService.getAuthenticatedUser();
+        return ResponseEntity.ok().body(true);
+    } catch(IllegalAccessException illegalAccessException){
+        return ResponseEntity.ok().body(false);
     }
+        
+   }
 }

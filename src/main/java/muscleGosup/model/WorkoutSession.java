@@ -1,7 +1,7 @@
 package muscleGosup.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,8 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.GenerationType;
 
 @Entity
@@ -31,8 +29,7 @@ public class WorkoutSession {
     // Store in seconds 
     private Long duration;
 
-    @Temporal(TemporalType.DATE)
-    private Date date;
+    private LocalDateTime date;
 
     @OneToMany(mappedBy = "workoutSession", cascade = CascadeType.ALL)
     private List<Exercise> exercises = new ArrayList<>();
@@ -61,11 +58,11 @@ public class WorkoutSession {
         this.duration = duration;
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

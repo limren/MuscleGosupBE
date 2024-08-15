@@ -1,11 +1,11 @@
 package muscleGosup.dto.WorkoutSession;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class WorkoutSessionCreateDto {
     private String title;
     private Long duration;
-    private Date date;
+    private LocalDateTime date;
     
     
     public String getTitle(){
@@ -14,7 +14,7 @@ public class WorkoutSessionCreateDto {
     public Long getDuration(){
         return duration;
     }
-    public Date getDate(){
+    public LocalDateTime getDate(){
         return date;
     }
 
@@ -24,7 +24,7 @@ public class WorkoutSessionCreateDto {
     public void setDuration(Long duration){
         this.duration = duration;
     }
-    public void setDate(Date date){
+    public void setDate(LocalDateTime date){
         this.date = date;
     }
 }

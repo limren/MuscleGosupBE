@@ -1,6 +1,5 @@
 package muscleGosup.controller;
 
-import java.util.Collections;
 import java.util.HashMap;
 
 import org.apache.catalina.connector.Response;
@@ -42,13 +41,19 @@ public class WorkoutSessionController {
     @GetMapping("/get/all")
     public ResponseEntity<Object> getWorkoutSessionsByUserId(){
         try{
-            return ResponseEntity.ok(Collections.singletonMap("workoutSessions", workoutSessionService.getWorkoutSessionsByUserId()));
+            return ResponseEntity.ok(workoutSessionService.getWorkoutSessionsByUserId());
         } catch(IllegalAccessException ex){
             return ResponseEntity.badRequest().body(ex.getMessage());
         } 
-        catch(RuntimeException ex){
+    }
+
+    @GetMapping("/get/thisWeek")
+    public ResponseEntity<Object> getThisWeekWorkoutSessions(){
+        try {
+            return ResponseEntity.ok(workoutSessionService.getThisWeekWorkoutSessions());
+        } catch (IllegalAccessException ex){
             return ResponseEntity.badRequest().body(ex.getMessage());
-        } 
+        }
     }
 
 }

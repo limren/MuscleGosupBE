@@ -44,6 +44,7 @@ public class UserService {
 
     public User getAuthenticatedUser() throws IllegalAccessException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println(principal);
         if(!(principal instanceof CustomUserDetails)){
             throw new IllegalAccessException("Couldn't retrieve authenticated user");
         }
