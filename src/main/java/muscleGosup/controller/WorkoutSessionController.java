@@ -2,7 +2,6 @@ package muscleGosup.controller;
 
 import java.util.HashMap;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,12 +35,21 @@ public class WorkoutSessionController {
         }
     }
 
+    @GetMapping("/get/all/groupedByDate")
+    public ResponseEntity<Object> getWorkoutSessionsGroupedByDate(){
+        try {
+            return ResponseEntity.ok().body(workoutSessionService.getWorkoutSessionsGroupedByDate());
+        } catch(IllegalAccessException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+    // TODO: change this 
     // Since workout sessions are related to one User, the convention makes that it will be retrieve by the authenticated user and so
     // related to the userId
     @GetMapping("/get/all")
     public ResponseEntity<Object> getWorkoutSessionsByUserId(){
         try{
-            return ResponseEntity.ok(workoutSessionService.getWorkoutSessionsByUserId());
+            return ResponseEntity.ok().body(workoutSessionService.getWorkoutSessionsByUserId());
         } catch(IllegalAccessException ex){
             return ResponseEntity.badRequest().body(ex.getMessage());
         } 
@@ -55,5 +63,7 @@ public class WorkoutSessionController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+
+    
 
 }

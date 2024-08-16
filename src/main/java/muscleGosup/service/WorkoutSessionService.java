@@ -1,9 +1,7 @@
 package muscleGosup.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
@@ -90,6 +88,11 @@ public class WorkoutSessionService {
         LocalDateTime endOfWeek = currentDate.plusDays(6).with(LocalTime.of(23, 59, 59));
 
         return workoutSessionRepository.findByUserAndDateBetween(user, startOfWeek, endOfWeek);
-        
+    }
+
+    public List<WorkoutSession> getWorkoutSessionsGroupedByDate() throws IllegalAccessException {
+        User user = userService.getAuthenticatedUser();
+        return workoutSessionRepository.findByUserGroupByDate(user);
+
     }
 }
