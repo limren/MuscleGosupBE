@@ -3,6 +3,8 @@ package muscleGosup.service;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -90,9 +92,14 @@ public class WorkoutSessionService {
         return workoutSessionRepository.findByUserAndDateBetween(user, startOfWeek, endOfWeek);
     }
 
-    public List<WorkoutSession> getWorkoutSessionsGroupedByDate() throws IllegalAccessException {
+    // Learned about Stream's API, gave me really useful knowledge to play with data in Collections 
+    public Map<Object, List<WorkoutSession>> getWorkoutSessionsGroupedByDate() throws IllegalAccessException {
         User user = userService.getAuthenticatedUser();
-        return workoutSessionRepository.findByUserGroupByDate(user);
+        List<WorkoutSession> sessions = workoutSessionRepository.findByUserId(user.getId());
+        Map<Object, List<WorkoutSession>> sessionsGroupedByDate = sessions.parallelStream().collect(Collectors.groupingBy(
+            session -> session.getDate().toLocalDate().toString()
+        ));
 
+        return sessionsGroupedByDate;
     }
 }

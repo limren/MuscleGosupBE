@@ -58,7 +58,7 @@ public class WorkoutSessionController {
     @GetMapping("/get/thisWeek")
     public ResponseEntity<Object> getThisWeekWorkoutSessions(){
         try {
-            return ResponseEntity.ok(workoutSessionService.getThisWeekWorkoutSessions());
+            return ResponseEntity.ok().body(workoutSessionService.getThisWeekWorkoutSessions());
         } catch (IllegalAccessException ex){
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
