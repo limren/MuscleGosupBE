@@ -50,6 +50,11 @@ public class WorkoutSessionService {
         }
     }
 
+    public List<WorkoutSession> getWorkoutSessions() throws IllegalAccessException {
+        User user = this.userService.getAuthenticatedUser();
+        return user.getWorkoutSessions();
+    }
+
     public WorkoutSession addExerciseWorkoutSession(Long workoutSessionId, Long userId, String name){
         WorkoutSession workoutSession = this.getWorkoutSessionById(workoutSessionId);
         Exercise exercise = exerciseService.createExercise(workoutSessionId, name);
@@ -72,7 +77,7 @@ public class WorkoutSessionService {
         workoutSessionRepository.deleteById(workoutSessionId);
         return true;
     }
-
+    
     public WorkoutSession getWorkoutSessionById(Long workoutSessionId){
         return workoutSessionRepository.findById(workoutSessionId).orElseThrow(() -> new ElementNotFoundException("Workout session with ID : " + workoutSessionId + "was not found."));
     }
@@ -99,7 +104,22 @@ public class WorkoutSessionService {
         Map<Object, List<WorkoutSession>> sessionsGroupedByDate = sessions.parallelStream().collect(Collectors.groupingBy(
             session -> session.getDate().toLocalDate().toString()
         ));
-
         return sessionsGroupedByDate;
     }
+
+    public Integer getThisWeekWorkoutSessionsCount() throws IllegalAccessException {
+        User user = userService.getAuthenticatedUser();
+        LocalDateTime currentDate = LocalDateTime.now();
+        int dayOfWeek = currentDate.getDayOfWeek().getValue();
+        LocalDateTime startOfWeek = currentDate.minusDays(dayOfWeek - 1).with(LocalTime.MIN);
+        LocalDateTime endOfWeek = currentDate.plusDays(6).with(LocalTime.of(23, 59, 59));
+    
+        return this.workoutSessionRepository.countWorkoutSessionsUserBetweenDate(user, startOfWeek, endOfWeek);
+    }
+
+    public Integer getUserWorkoutSessionsCount() throws IllegalAccessException {
+        User user = userService.getAuthenticatedUser();
+        return this.workoutSessionRepository.countWorkoutSessionsUser(user);
+    }
+
 }

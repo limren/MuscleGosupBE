@@ -1,6 +1,7 @@
 package muscleGosup.service;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import muscleGosup.model.CustomUserDetails;
 import muscleGosup.model.User;
-import muscleGosup.model.WorkoutSession;
 import muscleGosup.repository.UserRepository;
 
 @Service
@@ -35,13 +35,6 @@ public class UserService {
         return user;
     }
 
-
-    public List<WorkoutSession> getWorkoutSessions() throws IllegalAccessException {
-        User user = this.getAuthenticatedUser();
-        return user.getWorkoutSessions();
-
-    }
-
     public User getAuthenticatedUser() throws IllegalAccessException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         System.out.println(principal);
@@ -51,4 +44,15 @@ public class UserService {
         Long userId = ((CustomUserDetails)principal).getId();
         return commonService.getUserById(userId);  
     }
+
+    public Map<String, Object> getAuthenticatedUserRestricted() throws IllegalAccessException {
+        User authenticatedUser = this.getAuthenticatedUser();
+        Map<String, Object> restrictedUser = new HashMap<String, Object>();
+        restrictedUser.put("email", authenticatedUser.getEmail());
+        restrictedUser.put("username", authenticatedUser.getUsername());
+        restrictedUser.put("workoutSessions", authenticatedUser.getWorkoutSessions());
+        return restrictedUser;
+    }
+
+
 }

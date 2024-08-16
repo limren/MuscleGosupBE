@@ -35,6 +35,17 @@ public class WorkoutSessionController {
         }
     }
 
+
+    @GetMapping("/getWorkoutSessions")
+    public ResponseEntity<Object> getWorkoutSessions(){
+        try {
+            return ResponseEntity.ok().body(workoutSessionService.getWorkoutSessions());
+        } catch(Exception ex){
+            // #TODO: change request status
+            return ResponseEntity.badRequest().body("Something went wrong while trying to get workout sessions.");
+        }
+    }
+
     @GetMapping("/get/all/groupedByDate")
     public ResponseEntity<Object> getWorkoutSessionsGroupedByDate(){
         try {
@@ -64,6 +75,21 @@ public class WorkoutSessionController {
         }
     }
 
-    
+    @GetMapping("/get/thisWeek/count")
+    public ResponseEntity<Object> getThisWeekWorkoutSessionsCount(){
+        try{
+            return ResponseEntity.ok().body(workoutSessionService.getThisWeekWorkoutSessionsCount());
+        } catch(IllegalAccessException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+    @GetMapping("/get/all/count")
+    public ResponseEntity<Object> getWorkoutSessionsCount(){
+        try{
+            return ResponseEntity.ok().body(workoutSessionService.getUserWorkoutSessionsCount());
+        } catch(IllegalAccessException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 
 }
