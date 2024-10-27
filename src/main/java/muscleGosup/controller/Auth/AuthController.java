@@ -1,10 +1,6 @@
 package muscleGosup.controller.Auth;
 
-import java.util.Collections;
-import java.util.HashMap;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +20,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import muscleGosup.dto.Auth.UserLoginDto;
 import muscleGosup.dto.Auth.UserRegisterDto;
+import muscleGosup.exception.auth.EmailAlreadyTakenException;
+import muscleGosup.exception.auth.UsernameAlreadyTakenException;
 import muscleGosup.model.User;
 import muscleGosup.repository.UserRepository;
 import muscleGosup.service.UserService;
@@ -31,7 +29,7 @@ import muscleGosup.service.UserService;
 @RequestMapping("/api/auth")
 @RestController
 public class AuthController {
-    
+
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -46,51 +44,39 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody UserLoginDto userLoginDto,
-    HttpServletRequest request,
-    HttpServletResponse response){
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
+    public ResponseEntity<Object> login(@RequestBody UserLoginDto userLoginDto, HttpServletRequest request,
+                                        HttpServletResponse response) {
         User newUser = userRepository.findByUsername(userLoginDto.getUsername());
-        if(newUser == null || !passwordEncoder.matches(userLoginDto.getPassword(), newUser.getPassword())){
-            return new ResponseEntity<>("An error occurred while trying to log in : username or password is wrong.", HttpStatus.BAD_REQUEST);
+        if (newUser == null || !passwordEncoder.matches(userLoginDto.getPassword(), newUser.getPassword())) {
+            return ResponseEntity.badRequest().body("An error occurred while trying to log in : username or password is wrong");
         }
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDto.getUsername(), userLoginDto.getPassword()));
 
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDto.getUsername(), userLoginDto.getPassword()));
         context.setAuthentication(authentication);
+
         SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
         securityContextRepository.saveContext(context, request, response);
-        return ResponseEntity.ok(Collections.singletonMap("message", "User is now authenticated."));
+
+        return ResponseEntity.ok().body(true);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody UserRegisterDto userRegisterDto)
-    {
-        HashMap<String, Object> responseContent = new HashMap<>();
-        if(userRepository.existsByEmail(userRegisterDto.getEmail())){
-            responseContent.put("error", "The email is already taken!");
-            return ResponseEntity.badRequest().body(responseContent);
+    public ResponseEntity<Object> register(@RequestBody UserRegisterDto userRegisterDto) {
+        if (userRepository.existsByEmail(userRegisterDto.getEmail())) {
+            throw new EmailAlreadyTakenException();
         }
-        if(userRepository.existsByUsername(userRegisterDto.getUsername()))
-        {
-            responseContent.put("error", "The username is already used by another user!");
-            return ResponseEntity.badRequest().body(responseContent);
+        if (userRepository.existsByUsername(userRegisterDto.getUsername())) {
+            throw new UsernameAlreadyTakenException();
         }
 
-        User newUser = userService.createUser(userRegisterDto.getUsername(), userRegisterDto.getEmail(), userRegisterDto.getPassword());
-        responseContent.put("user", newUser);
-        responseContent.put("message", "User successfully created.");
-        return new ResponseEntity<>(responseContent, HttpStatus.OK);
+        return ResponseEntity.ok(userService.createUser(userRegisterDto.getUsername(), userRegisterDto.getEmail(), userRegisterDto.getPassword()));
     }
 
-    // Since it passes the SecurityFilterChain, it means that the user has been truly authenticated (cookie works)
    @GetMapping("/isLoggedIn")
-   public ResponseEntity<Object> isLoggedIn(){
-    try {
-        userService.getAuthenticatedUser();
-        return ResponseEntity.ok().body(true);
-    } catch(IllegalAccessException illegalAccessException){
-        return ResponseEntity.ok().body(false);
-    }
-        
+   public ResponseEntity<Object> isLoggedIn() {
+    userService.getAuthenticatedUser();
+    return ResponseEntity.ok().body(true);
    }
 }

@@ -16,14 +16,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-
     @GetMapping("/get/auth")
     public ResponseEntity<Object> getUser(){
-        try {
-            return ResponseEntity.ok().body(userService.getAuthenticatedUserRestricted());
-        } catch(IllegalAccessException ex){
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+        return ResponseEntity.ok().body(userService.getAuthenticatedUserRestricted());
     }
-    
 }

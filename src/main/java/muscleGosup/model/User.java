@@ -1,5 +1,6 @@
 package muscleGosup.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,18 +20,21 @@ public class User {
     private Long id;
     private String username;
     private String email;
+    @JsonIgnore
     private String password;
 
-    public User(){
+    public User() {
     };
 
-    public Long getId(){
+    public Long getId() {
         return this.id;
     }
-    public String getUsername(){
+
+    public String getUsername() {
         return this.username;
     }
-    public String getEmail(){
+
+    public String getEmail() {
         return this.email;
     }
 

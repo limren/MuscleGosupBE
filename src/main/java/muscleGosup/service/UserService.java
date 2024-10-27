@@ -36,16 +36,16 @@ public class UserService {
         return user;
     }
 
-    public User getAuthenticatedUser() throws IllegalAccessException {
+    public User getAuthenticatedUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!(principal instanceof CustomUserDetails)){
-            throw new IllegalAccessException("Couldn't get authenticated user");
+            throw new UserNotFoundException("Couldn't get authenticated user");
         }
         Long userId = ((CustomUserDetails)principal).getId();
         return this.getUserById(userId).orElseThrow(() -> new UserNotFoundException("Couldn't get user from Id"));
     }
 
-    public Map<String, Object> getAuthenticatedUserRestricted() throws IllegalAccessException {
+    public Map<String, Object> getAuthenticatedUserRestricted() {
         User authenticatedUser = this.getAuthenticatedUser();
         Map<String, Object> restrictedUser = new HashMap<String, Object>();
         restrictedUser.put("email", authenticatedUser.getEmail());
