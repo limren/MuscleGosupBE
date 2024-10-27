@@ -2,12 +2,12 @@ package muscleGosup.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import muscleGosup.exception.UserNotFoundException;
 import muscleGosup.model.CustomUserDetails;
 import muscleGosup.model.User;
 import muscleGosup.repository.UserRepository;
@@ -17,16 +17,17 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final CommonService commonService;
-    @Autowired
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository, CommonService commonService) {
+
+    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-        this.commonService = commonService;
     }
 
-    public User createUser(String username, String email, String password)
-    {
+    public Optional<User> getUserById(Long userId) {
+        return userRepository.findById(userId);
+    }
+
+    public User createUser(String username, String email, String password) {
         User user = new User();
         user.setEmail(email);
         user.setUsername(username);
@@ -37,12 +38,11 @@ public class UserService {
 
     public User getAuthenticatedUser() throws IllegalAccessException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println(principal);
-        if(!(principal instanceof CustomUserDetails)){
-            throw new IllegalAccessException("Couldn't retrieve authenticated user");
+        if (!(principal instanceof CustomUserDetails)){
+            throw new IllegalAccessException("Couldn't get authenticated user");
         }
         Long userId = ((CustomUserDetails)principal).getId();
-        return commonService.getUserById(userId);  
+        return this.getUserById(userId).orElseThrow(() -> new UserNotFoundException("Couldn't get user from Id"));
     }
 
     public Map<String, Object> getAuthenticatedUserRestricted() throws IllegalAccessException {
@@ -50,9 +50,6 @@ public class UserService {
         Map<String, Object> restrictedUser = new HashMap<String, Object>();
         restrictedUser.put("email", authenticatedUser.getEmail());
         restrictedUser.put("username", authenticatedUser.getUsername());
-        restrictedUser.put("workoutSessions", authenticatedUser.getWorkoutSessions());
         return restrictedUser;
     }
-
-
 }

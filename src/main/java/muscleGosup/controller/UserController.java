@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import muscleGosup.service.UserService;
 
 
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 @RestController
 public class UserController {
 
@@ -17,7 +17,7 @@ public class UserController {
     private UserService userService;
 
 
-    @GetMapping("/get/user/auth")
+    @GetMapping("/get/auth")
     public ResponseEntity<Object> getUser(){
         try {
             return ResponseEntity.ok().body(userService.getAuthenticatedUserRestricted());

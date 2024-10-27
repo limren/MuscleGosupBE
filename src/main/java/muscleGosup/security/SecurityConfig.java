@@ -22,10 +22,9 @@ import muscleGosup.service.CustomUserDetailsService;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    
+
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
-
 
     @Bean
     public static PasswordEncoder passwordEncoder(){

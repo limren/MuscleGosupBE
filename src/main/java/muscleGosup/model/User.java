@@ -1,14 +1,9 @@
 package muscleGosup.model;
 
-
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -21,15 +16,13 @@ import jakarta.persistence.UniqueConstraint;
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    public Long id;
-    public String username;
-    public String email;
-    public String password;
+    private Long id;
+    private String username;
+    private String email;
+    private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<WorkoutSession> workoutSessions;
-
-    public User(){};
+    public User(){
+    };
 
     public Long getId(){
         return this.id;
@@ -55,12 +48,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public List<WorkoutSession> getWorkoutSessions(){
-        return this.workoutSessions;
-    }
-    public void setWorkoutSessions(List<WorkoutSession> workoutSessions) {
-        this.workoutSessions = workoutSessions;
     }
 }
